@@ -32,7 +32,7 @@ local Library = {
     FontColor = Color3.fromRGB(255, 255, 255);
     MainColor = Color3.fromRGB(28, 28, 28);
     BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(0, 85, 255);
+    AccentColor = Color3.fromRGB(205, 180, 220);
     OutlineColor = Color3.fromRGB(50, 50, 50);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
@@ -716,7 +716,7 @@ do
 
                 ContextMenu.Container.Size = UDim2.fromOffset(
                     menuWidth + 8,
-                    ContextMenu.Inner.Layout.AbsoluteContentSize.Y + 4
+                    ContextMenu.Inner.Layout.AbsoluteContentSize.Y + 2
                 )
             end
 
@@ -2948,7 +2948,7 @@ function Library:CreateWindow(...)
     if type(Config.MenuFadeTime) ~= 'number' then Config.MenuFadeTime = 0.2 end
 
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
-    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 600) end
+    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 400) end
 
     if Config.Center then
         Config.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -2995,6 +2995,65 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     });
+
+    local originalLabel = WindowLabel
+    if type(WindowLabel) == "table" and WindowLabel.Object then
+        originalLabel = WindowLabel.Object -- For libraries that return objects in a wrapper
+    end
+
+    originalLabel.Visible = false
+
+    local titleFrame = Instance.new("Frame")
+    titleFrame.Position = originalLabel.Position
+    titleFrame.Size = originalLabel.Size
+    titleFrame.BackgroundTransparency = 1
+    titleFrame.ZIndex = originalLabel.ZIndex
+    titleFrame.Parent = originalLabel.Parent
+
+    local titleParts = {
+        {text = "Pinguin", color = Color3.fromRGB(255, 255, 255)},
+        {text = "Development", color = Color3.fromRGB(205, 180, 220)},
+        {text = "  |  ", color = Color3.fromRGB(255, 255, 255)},
+        {text = "Premium", color = Color3.fromRGB(205, 180, 220)},
+        {text = "  |  South Bronx: The Trenches", color = Color3.fromRGB(255, 255, 255)}
+    }
+
+    local TextService
+    pcall(function()
+        TextService = game:GetService("TextService")
+    end)
+
+    local xPos = 0
+    for _, part in ipairs(titleParts) do
+        local label = Instance.new("TextLabel")
+        label.Text = part.text
+        label.TextColor3 = part.color
+        label.BackgroundTransparency = 1
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Position = UDim2.new(0, xPos, 0, 0)
+        label.Font = originalLabel.Font
+        label.TextSize = originalLabel.TextSize
+        label.ZIndex = originalLabel.ZIndex
+        label.Parent = titleFrame
+        
+        -- Calculate text width more accurately if TextService is available
+        local textWidth
+        if TextService then
+            local textSize = TextService:GetTextSize(
+                part.text, 
+                originalLabel.TextSize, 
+                originalLabel.Font, 
+                Vector2.new(1000, 1000)
+            )
+            textWidth = textSize.X
+        else
+            -- Fallback to approximate calculation
+            textWidth = part.text:len() * (originalLabel.TextSize * 0.6)
+        end
+        
+        label.Size = UDim2.new(0, textWidth, 1, 0)
+        xPos = xPos + textWidth
+    end
 
     local MainSectionOuter = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor;
@@ -3115,7 +3174,7 @@ function Library:CreateWindow(...)
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
             Position = UDim2.new(0, 8 - 1, 0, 8 - 1);
-            Size = UDim2.new(0.5, -12 + 2, 0, 507 + 2);
+            Size = UDim2.new(0.5, -12 + 2, 0, 307 + 2);
             CanvasSize = UDim2.new(0, 0, 0, 0);
             BottomImage = '';
             TopImage = '';
@@ -3128,7 +3187,7 @@ function Library:CreateWindow(...)
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
             Position = UDim2.new(0.5, 4 + 1, 0, 8 - 1);
-            Size = UDim2.new(0.5, -12 + 2, 0, 507 + 2);
+            Size = UDim2.new(0.5, -12 + 2, 0, 307 + 2);
             CanvasSize = UDim2.new(0, 0, 0, 0);
             BottomImage = '';
             TopImage = '';
